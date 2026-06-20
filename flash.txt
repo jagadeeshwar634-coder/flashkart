@@ -1,0 +1,30 @@
+const express = require("express");
+
+const app = express();
+const PORT = 3000;
+
+const flashcards = [
+  {
+    id: 1,
+    question: "What is HTML?",
+    answer: "HyperText Markup Language"
+  },
+  {
+    id: 2,
+    question: "What is CSS?",
+    answer: "Cascading Style Sheets"
+  },
+  {
+    id: 3,
+    question: "What is JavaScript?",
+    answer: "A programming language for web development"
+  }
+];
+
+app.get("/api/flashcards", (req, res) => {
+  res.json(flashcards);
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});

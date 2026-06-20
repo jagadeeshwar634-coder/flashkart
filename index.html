@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashkart - 100 Questions</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .option-btn {
+      transition: all 0.3s;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: #667eea;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    }
+    .option-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .nav-btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      background: #667eea;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 8px 0;
+    }
+    .nav-btn:disabled {
+      background: #b9b9b9;
+      cursor: not-allowed;
+    }
+    @media (max-width: 600px) {
+      #options { grid-template-columns: 1fr !important; }
+      #question { font-size: 22px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="flashkart-container" style="
+    max-width: 800px; margin: 50px auto; padding: 40px;
+    background: white; border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  ">
+    <div id="progress-bar" style="width:100%;height:20px;background:#e0e0e0;border-radius:10px;">
+      <div id="progress" style="width:0%;height:100%;background:linear-gradient(90deg,#667eea,#764ba2);transition:width 0.5s;border-radius:10px;"></div>
+    </div>
+    <div id="progress-text" style="text-align:center;margin:15px 0;font-size:16px;color:#666;font-weight:600;"></div>
+    <div id="category" style="text-align:center;margin:10px 0;font-size:14px;color:#667eea;font-weight:600;text-transform:uppercase;"></div>
+    <div id="question" style="font-size:26px;margin:30px 0;font-weight:bold;color:#333;text-align:center;"></div>
+    <div id="options" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;justify-content:center;"></div>
+
+    <div style="text-align:center;margin-top:20px;">
+      <button id="prevBtn" class="nav-btn" onclick="previousQuestion()">Previous</button>
+      <button id="nextBtn" class="nav-btn" onclick="nextQuestion()">Next</button>
+    </div>
+
+    <div id="score" style="margin:30px 0;font-size:22px;color:#667eea;font-weight:bold;text-align:center;"></div>
+    <div id="status" style="text-align:center;margin:20px 0;font-size:18px;color:#28a745;font-weight:600;"></div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000/api';
+
+    let state = {
+      sessionId: null,
+      currentIndex: 0,
+      score: 0,
+      isProcessing: false,
+      totalQuestions: 0
+    };
+
+    let currentQuestion = null;
+
+    const DOM = {
+      progress: document.getElementById('progress'),
+      progressText: document.getElementById('progress-text'),
+      category: document.getElementById('category'),
+      question: document.getElementById('question'),
+      options: document.getElementById('options'),
+      score: document.getElementById('score'),
+      status: document.getElementById('status'),
+      result: document.getElementById('result'),
+      prevBtn: document.getElementById('prevBtn'),
+      nextBtn: document.getElementById('nextBtn')
+    };
+
+    async function startQuiz() {
+      state.isProcessing = false;
+
+      try {
+        const res = await fetch(`${API}/session/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category: 'ALL' })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          state.sessionId = data.sessionId;
+          state.currentIndex = 0;
+          state.score = 0;
+          state.totalQuestions = data.totalQuestions;
+          DOM.result.innerHTML = '';
+          await loadCurrentQuestion();
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.error('Error starting quiz:', error);
+        DOM.question.textContent = '❌ Error: Failed to connect to backend';
+        DOM.status.textContent = 'Please start the backend server first';
+        DOM.status.style.color = '#dc3545';
+      }
+    }
+
+    async function loadCurrentQuestion() {
+      try {
+        const res = await fetch(`${API}/session/${state.sessionId}/question?index=${state.currentIndex}`);
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.message);
+        }
+
+        currentQuestion = data.data.question;
+        state.currentIndex = data.data.currentIndex;
+        state.totalQuestions = data.data.totalQuestions;
+
+        showQuestion(currentQuestion, data.data.previousIndex, data.data.nextIndex);
+      } catch (error) {
+        console.error('Error loading question:', error);
+        DOM.status.textContent = '❌ Error: Failed to load question';
+        DOM.status.style.color = '#dc3545';
+      }
+    }
+
+    function showQuestion(q, previousIndex, nextIndex) {
+      if (!q) {
+        DOM.question.textContent = '❌ No question found';
+        return;
+      }
+
+      DOM.category.textContent = q.cat;
+      DOM.question.textContent = q.q;
+      DOM.options.innerHTML = '';
+      DOM.status.textContent = '';
+      DOM.score.textContent = `Score: ${state.score}/${state.currentIndex + 1}`;
+
+      q.opt.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = 'option-btn';
+        btn.style.padding = '20px 25px';
+        btn.style.fontSize = '18px';
+        btn.style.border = '2px solid #667eea';
+        btn.style.background = '#fff';
+        btn.style.cursor = 'pointer';
+        btn.style.borderRadius = '12px';
+        btn.style.transition = 'all 0.3s';
+        btn.style.fontWeight = '500';
+        btn.onclick = () => selectAnswer(idx, btn);
+        DOM.options.appendChild(btn);
+      });
+
+      DOM.prevBtn.disabled = previousIndex === null;
+      DOM.nextBtn.disabled = nextIndex === null;
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const pct = ((state.currentIndex + 1) / state.totalQuestions) * 100;
+      DOM.progress.style.width = `${pct}%`;
+      DOM.progressText.textContent = `Question ${state.currentIndex + 1}/${state.totalQuestions}`;
+    }
+
+    async function selectAnswer(idx, btn) {
+      if (state.isProcessing || btn.disabled) return;
+      state.isProcessing = true;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/session/answer`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: state.sessionId,
+            questionId: currentQuestion.id,
+            selectedOption: idx
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          state.score = data.score;
+          DOM.score.textContent = `Score: ${state.score}/${state.currentIndex + 1}`;
+
+          btn.style.background = data.isCorrect ? '#d4edda' : '#f8d7da';
+          btn.style.borderColor = data.isCorrect ? '#28a745' : '#dc3545';
+          btn.style.color = data.isCorrect ? '#28a745' : '#dc3545';
+
+          DOM.status.textContent = data.isCorrect ? '✅ Correct!' : '❌ Wrong!';
+          strikeThrough(btn);
+
+          if (state.currentIndex + 1 >= state.totalQuestions) {
+            DOM.status.textContent += ' 🎉 Complete!';
+            setTimeout(() => loadCurrentQuestion(), 1000);
+          } else {
+            DOM.status.textContent += ' ⏩ Auto-next...';
+            setTimeout(async () => {
+              state.isProcessing = false;
+              state.currentIndex++;
+              await loadCurrentQuestion();
+            }, 800);
+          }
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.error('Error submitting answer:', error);
+        DOM.status.textContent = '❌ Error: Failed to submit answer';
+        DOM.status.style.color = '#dc3545';
+        state.isProcessing = false;
+      }
+    }
+
+    function strikeThrough(selected) {
+      const btns = DOM.options.querySelectorAll('.option-btn');
+      btns.forEach(btn => {
+        if (btn !== selected && !btn.disabled) {
+          btn.disabled = true;
+          btn.style.opacity = '0.4';
+          btn.innerHTML = `<span style="text-decoration: line-through; color: #999;">${btn.textContent}</span>`;
+        }
+      });
+    }
+
+    function previousQuestion() {
+      if (state.currentIndex > 0) {
+        state.currentIndex--;
+        loadCurrentQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (state.currentIndex < state.totalQuestions - 1) {
+        state.currentIndex++;
+        loadCurrentQuestion();
+      }
+    }
+
+    function showResults(results) {
+      DOM.question.textContent = '🎉 Completed!';
+      DOM.options.innerHTML = '';
+      DOM.category.textContent = '';
+      DOM.status.textContent = '';
+      DOM.progress.style.width = '100%';
+      DOM.progressText.textContent = `Completed!`;
+
+      DOM.result.innerHTML = `
+        <div style="text-align:center;margin:40px 0;">
+          <h2 style="font-size:40px;color:#667eea;margin:20px 0;">Score: ${results.totalScore}/${results.totalQuestions}</h2>
+          <h3 style="font-size:30px;color:#28a745;margin:15px 0;">Accuracy: ${results.accuracy}%</h3>
+          <button onclick="restartQuiz()" style="
+            padding:25px 50px;font-size:22px;
+            background:linear-gradient(90deg,#667eea,#764ba2);
+            color:white;border:none;cursor:pointer;
+            border-radius:15px;margin:30px 0;font-weight:bold;
+          ">🔄 Restart</button>
+        </div>
+      `;
+    }
+
+    async function restartQuiz() {
+      DOM.result.innerHTML = '';
+      DOM.progress.style.width = '0%';
+      await startQuiz();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (state.isProcessing || DOM.result.innerHTML) return;
+
+      const btns = DOM.options.querySelectorAll('.option-btn');
+      const map = { '1': 0, '2': 1, '3': 2, '4': 3 };
+
+      if (map[e.key] !== undefined && btns[map[e.key]] && !btns[map[e.key]].disabled) {
+        selectAnswer(map[e.key], btns[map[e.key]]);
+      }
+
+      if (e.key === 'r' && DOM.result.innerHTML) restartQuiz();
+    });
+
+    startQuiz();
+    console.log('✅ Flashkart Frontend loaded - Connected to backend!');
+    console.log('⌨️ Press 1-4 for answers, R for restart');
+  </script>
+</body>
+</html>

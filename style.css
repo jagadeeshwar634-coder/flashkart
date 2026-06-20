@@ -1,0 +1,521 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  padding: 20px;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* 2. MAIN CONTAINER - Premium Card Design */
+#flashkart-container {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 50px;
+  background: white;
+  border-radius: 30px;
+  box-shadow: 
+    0 30px 100px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  position: relative;
+  overflow: hidden;
+  animation: slideIn 0.8s ease-out;
+}
+
+#flashkart-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
+  animation: gradientMove 3s linear infinite;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* 3. PROGRESS BAR - Smooth & Professional */
+.progress-bar {
+  width: 100%;
+  height: 25px;
+  background: #f0f0f0;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 15px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-text {
+  text-align: center;
+  margin: 20px 0 15px;
+  font-size: 16px;
+  color: #666;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* 4. CATEGORY - Elegant Badge */
+.category {
+  text-align: center;
+  margin: 15px 0 20px;
+  font-size: 15px;
+  color: white;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  animation: categoryPop 0.5s ease-out;
+}
+
+@keyframes categoryPop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 5. QUESTION - Bold & Clear */
+.question {
+  font-size: 28px;
+  margin: 35px 0 40px;
+  font-weight: 700;
+  color: #2d3748;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+  animation: questionFade 0.6s ease-out;
+}
+
+@keyframes questionFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 6. OPTIONS - Beautiful Buttons with Hover Effects */
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 35px;
+}
+
+.option-btn {
+  padding: 25px 30px;
+  font-size: 18px;
+  border: 2px solid #667eea;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  letter-spacing: 0.3px;
+}
+
+.option-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(102, 126, 234, 0.2) 50%,
+    rgba(102, 126, 234, 0.1) 100%
+  );
+  transition: left 0.5s ease;
+}
+
+.option-btn:hover::before {
+  left: 100%;
+}
+
+.option-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 
+    0 12px 30px rgba(102, 126, 234, 0.5),
+    0 0 0 2px rgba(102, 126, 234, 0.3);
+  border-color: transparent;
+}
+
+.option-btn:active:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.option-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.option-btn.correct {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+  animation: correctBounce 0.6s ease-out;
+}
+
+.option-btn.wrong {
+  background: linear-gradient(135deg, #dc3545, #fd7e14);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 8px 25px rgba(220, 53, 69, 0.5);
+  animation: wrongShake 0.5s ease-out;
+}
+
+@keyframes correctBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* Strike-through effect */
+.option-btn.strike {
+  opacity: 0.4;
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* 7. SCORE - Eye-Catching Display */
+.score {
+  margin: 35px 0 25px;
+  font-size: 26px;
+  color: #667eea;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+/* 8. STATUS - Success/Error Feedback */
+.status {
+  text-align: center;
+  margin: 25px 0 20px;
+  font-size: 20px;
+  color: #28a745;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 15px;
+  background: rgba(40, 167, 69, 0.1);
+  border-radius: 12px;
+  animation: statusSlide 0.5s ease-out;
+}
+
+.status.error {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+@keyframes statusSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 9. RESULTS - Premium Final Screen */
+.results {
+  text-align: center;
+  margin: 40px 0;
+  animation: resultsPop 0.8s ease-out;
+}
+
+@keyframes resultsPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.results h2 {
+  font-size: 45px;
+  color: #667eea;
+  margin: 25px 0;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.results h3 {
+  font-size: 32px;
+  color: #28a745;
+  margin: 15px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.results p {
+  font-size: 18px;
+  color: #666;
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+/* 10. RESTART BUTTON - Premium Call-to-Action */
+.restart-btn {
+  padding: 28px 60px;
+  font-size: 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 50px;
+  margin: 40px 0;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 15px 40px rgba(102, 126, 234, 0.5),
+    0 0 0 2px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.restart-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #764ba2, #667eea);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.restart-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 20px 50px rgba(102, 126, 234, 0.6),
+    0 0 0 2px rgba(102, 126, 234, 0.4);
+}
+
+.restart-btn:hover::before {
+  opacity: 1;
+}
+
+.restart-btn:active {
+  transform: translateY(-2px);
+}
+
+/* 11. MOBILE RESPONSIVE - Optimized */
+@media (max-width: 768px) {
+  #flashkart-container {
+    margin: 30px auto;
+    padding: 35px;
+    border-radius: 25px;
+  }
+  
+  .options {
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+  }
+  
+  .question {
+    font-size: 24px !important;
+    margin: 25px 0 30px;
+  }
+  
+  .option-btn {
+    padding: 20px 25px !important;
+    font-size: 17px !important;
+  }
+  
+  .results h2 {
+    font-size: 35px !important;
+  }
+  
+  .results h3 {
+    font-size: 26px !important;
+  }
+  
+  .restart-btn {
+    padding: 24px 50px !important;
+    font-size: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #flashkart-container {
+    padding: 25px;
+    margin: 20px auto;
+  }
+  
+  .question {
+    font-size: 20px !important;
+  }
+  
+  .option-btn {
+    padding: 18px 20px !important;
+    font-size: 16px !important;
+  }
+}
+
+/* 12. PERFORMANCE - Strong Efficiency */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 13. HIGH CONTRAST - Accessibility */
+@media (prefers-contrast: high) {
+  .option-btn {
+    border-width: 3px;
+  }
+  
+  .progress-fill {
+    background: #667eea;
+  }
+}
+
+/* 14. DARK MODE - Automatic */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+  }
+  
+  #flashkart-container {
+    background: #1a1a2e;
+    color: #fff;
+  }
+  
+  .question {
+    color: #fff;
+  }
+  
+  .option-btn {
+    background: #2d3748;
+    color: #fff;
+    border-color: #667eea;
+  }
+  
+  .option-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+  }
+  
+  .score {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+}
+
+/* 15. PRINT - Clean Output */
+@media print {
+  body {
+    background: white;
+  }
+  
+  #flashkart-container {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  .option-btn {
+    border: 1px solid #333;
+  }
+}
